@@ -1,0 +1,4 @@
+name: NikoAPI
+version: '${project.version}'
+main: chatzis.nikolas.mc.nikoapi.NikoAPI
+api-version: '1.20'
