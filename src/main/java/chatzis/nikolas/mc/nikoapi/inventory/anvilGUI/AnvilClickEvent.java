@@ -90,22 +90,4 @@ public class AnvilClickEvent {
         this.close = close;
     }
 
-    /**
-     * GUI will be destroyed after the event
-     * @return boolean - GUI will destroy itself
-     * @since 0.0.1
-     */
-    @Deprecated
-    public boolean getWillDestroy() {
-        return destroy;
-    }
-
-    /**
-     * Set if the GUI should be destroyed after the event
-     * @param destroy boolean - GUI will destroy itself
-     * @since 0.0.1
-     */
-    public void setWillDestroy(boolean destroy) {
-        this.destroy = destroy;
-    }
 }

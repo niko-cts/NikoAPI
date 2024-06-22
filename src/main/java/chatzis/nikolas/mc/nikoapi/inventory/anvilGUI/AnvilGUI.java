@@ -73,7 +73,7 @@ public class AnvilGUI {
 
                         handler.onAnvilClick(clickEvent);
 
-                        if (clickEvent.getWillClose() || clickEvent.getWillDestroy())
+                        if (clickEvent.getWillClose())
                             closeInventory();
                     }
                 }
