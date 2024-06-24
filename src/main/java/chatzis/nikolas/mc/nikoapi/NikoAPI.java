@@ -20,9 +20,12 @@ public final class NikoAPI extends JavaPlugin {
     private static NikoAPI instance;
     private PlayerHandler playerHandler;
 
+    public NikoAPI() {
+        instance = this;
+    }
+
     @Override
     public void onEnable() {
-        instance = this;
         this.playerHandler = new PlayerHandler();
 
         new RegisterBuilderUtil(this)

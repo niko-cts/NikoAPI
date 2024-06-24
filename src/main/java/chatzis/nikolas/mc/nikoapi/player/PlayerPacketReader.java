@@ -1,5 +1,6 @@
 package chatzis.nikolas.mc.nikoapi.player;
 
+import chatzis.nikolas.mc.nikoapi.NikoAPI;
 import chatzis.nikolas.mc.nikoapi.packet.reader.APIListenerManager;
 import chatzis.nikolas.mc.nikoapi.util.ReflectionHelper;
 import chatzis.nikolas.mc.nikoapi.util.Utils;
@@ -138,7 +139,7 @@ public class PlayerPacketReader {
     }
 
     private Connection getConnection() {
-        return ReflectionHelper.get(ServerGamePacketListenerImpl.class, Utils.getPlayerConnection(player), "e");
+        return ReflectionHelper.get(ServerGamePacketListenerImpl.class, Utils.getPlayerConnection(player), "h");
     }
 
 }

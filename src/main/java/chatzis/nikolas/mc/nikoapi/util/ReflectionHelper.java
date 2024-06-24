@@ -89,7 +89,8 @@ public class ReflectionHelper {
             field.setAccessible(true);
             return (T) field.get(instance);
         } catch (NoSuchFieldException | IllegalAccessException | NullPointerException | ClassCastException e) {
-            LOG.log(Level.WARNING, "Error getting '{0}' in {1} with message: {2}", new String[]{name, clazz.getName(), e.getMessage()});
+            LOG.log(Level.SEVERE, "Error getting '{0}' in {1} with message: {2}", new String[]{name, clazz.getName(), e.getMessage()});
+            LOG.log(Level.SEVERE, "Error is", e);
         }
         return null;
     }
@@ -109,7 +110,8 @@ public class ReflectionHelper {
             return method.invoke(instance);
         } catch (IllegalAccessException | NullPointerException | InvocationTargetException |
                  NoSuchMethodException e) {
-            LOG.log(Level.WARNING, "Error getting through method '{0}' in {1} with message: {2}", new String[]{methodName, clazz.getName(), e.getMessage()});
+            LOG.log(Level.SEVERE, "Error getting through method '{0}' in {1} with message: {2}", new String[]{methodName, clazz.getName(), e.getMessage()});
+            LOG.log(Level.SEVERE, "Error is", e);
         }
         return null;
     }
