@@ -3,11 +3,6 @@ package chatzis.nikolas.mc.nikoapi.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Ref;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -103,7 +98,7 @@ public class ReflectionHelper {
      * @param methodName String - Name of method
      * @return Object - Object to from method
      */
-    public static Object getObjectThroughMethod(Class<?> clazz, String methodName, Object instance) {
+    public static Object invokeMethod(Class<?> clazz, String methodName, Object instance) {
         try {
             Method method = clazz.getDeclaredMethod(methodName);
             method.setAccessible(true);

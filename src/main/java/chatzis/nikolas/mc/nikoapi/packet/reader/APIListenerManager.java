@@ -7,7 +7,6 @@ import chatzis.nikolas.mc.nikoapi.util.Utils;
 import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.world.InteractionHand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
@@ -135,7 +134,7 @@ public class APIListenerManager {
 				return;
 			}
 
-			Object actionObject = ReflectionHelper.getObjectThroughMethod(actionInterfaceInstance.getClass(), "a", actionInterfaceInstance);
+			Object actionObject = ReflectionHelper.invokeMethod(actionInterfaceInstance.getClass(), "a", actionInterfaceInstance);
 			action = actionObject == null ? "INTERACT" : actionObject.toString();
 
 			// Action is interact_at that is called with interacting
@@ -149,9 +148,9 @@ public class APIListenerManager {
 			}
 			boolean shift = player.isSneaking();
 
-			ClickType clickType = switch (action.toLowerCase()) {
-				case "a", "attack" -> shift ? ClickType.SHIFT_LEFT : ClickType.RIGHT;
-				case "b", "interact" -> shift ? ClickType.SHIFT_RIGHT : ClickType.RIGHT;
+			ClickType clickType = switch (action.toUpperCase()) {
+				case "A", "ATTACK" -> shift ? ClickType.SHIFT_LEFT : ClickType.LEFT;
+				case "B", "INTERACT" -> shift ? ClickType.SHIFT_RIGHT : ClickType.RIGHT;
 				default -> {
 					NikoAPI.getInstance().getLogger().warning("Could not find action type for NPCPacket: " + action);
 					yield ClickType.RIGHT;
