@@ -122,57 +122,55 @@ public class APIListenerManager {
 		if (!(packet instanceof ServerboundInteractPacket interactPacket))
 			return;
 		PacketTypes type = PacketTypes.getByPacketClass(packet);
-		if (type == null || !packetListener.containsKey(type)) return;
+		if (type != PacketTypes.INTERACT || !packetListener.containsKey(type)) return; // ONLY INTERACT IS READ CURRENT PACKET
 
-		if (type == PacketTypes.INTERACT) {
-			String action;
+		String action;
 
-			Object actionInterfaceInstance = ReflectionHelper.get(ServerboundInteractPacket.class, packet, "b");
+		Object actionInterfaceInstance = ReflectionHelper.get(interactPacket, "b");
 
-			if (actionInterfaceInstance == null) {
-				NikoAPI.getInstance().getLogger().warning("Could not get the action of the InteractionPacket");
-				return;
+		if (actionInterfaceInstance == null) {
+			NikoAPI.getInstance().getLogger().warning("Could not get the action of the InteractionPacket");
+			return;
+		}
+
+		Object actionObject = ReflectionHelper.invokeMethod(actionInterfaceInstance.getClass(), "a", actionInterfaceInstance);
+		action = actionObject == null ? "INTERACT" : actionObject.toString();
+
+		// Action is interact_at that is called with interacting
+		if (action.equalsIgnoreCase("c") || action.equalsIgnoreCase("interact_at"))
+			return;
+
+		Integer entityId = ReflectionHelper.get(interactPacket, "a");
+		if (entityId == null) {
+			NikoAPI.getInstance().getLogger().warning("Could not determine the entityId for NPCInteractPacket");
+			return;
+		}
+		boolean shift = player.isSneaking();
+
+		ClickType clickType = switch (action.toUpperCase()) {
+			case "A", "ATTACK" -> shift ? ClickType.SHIFT_LEFT : ClickType.LEFT;
+			case "B", "INTERACT" -> shift ? ClickType.SHIFT_RIGHT : ClickType.RIGHT;
+			default -> {
+				NikoAPI.getInstance().getLogger().warning("Could not find action type for NPCPacket: " + action);
+				yield ClickType.RIGHT;
 			}
+		};
 
-			Object actionObject = ReflectionHelper.invokeMethod(actionInterfaceInstance.getClass(), "a", actionInterfaceInstance);
-			action = actionObject == null ? "INTERACT" : actionObject.toString();
-
-			// Action is interact_at that is called with interacting
-			if (action.equalsIgnoreCase("c") || action.equalsIgnoreCase("interact_at"))
+		if (clickType.isRightClick()) {
+			Object hand = ReflectionHelper.get(actionInterfaceInstance, "a");
+			if (hand != null && !hand.toString().equals("MAIN_HAND"))
 				return;
+		}
 
-			Integer entityId = ReflectionHelper.get(interactPacket, "a");
-			if (entityId == null) {
-				NikoAPI.getInstance().getLogger().warning("Could not determine the entityId for NPCInteractPacket");
-				return;
-			}
-			boolean shift = player.isSneaking();
+		for (IAPIListener iapiListener : packetListener.get(type)) {
+			if (!(iapiListener instanceof PacketEntityUseListener))
+				continue;
 
-			ClickType clickType = switch (action.toUpperCase()) {
-				case "A", "ATTACK" -> shift ? ClickType.SHIFT_LEFT : ClickType.LEFT;
-				case "B", "INTERACT" -> shift ? ClickType.SHIFT_RIGHT : ClickType.RIGHT;
-				default -> {
-					NikoAPI.getInstance().getLogger().warning("Could not find action type for NPCPacket: " + action);
-					yield ClickType.RIGHT;
-				}
-			};
-
-			if (clickType.isRightClick()) {
-				Object hand = ReflectionHelper.get(actionInterfaceInstance, "a");
-				if (hand != null && !hand.toString().equals("MAIN_HAND"))
-					return;
-			}
-
-			for (IAPIListener iapiListener : packetListener.get(type)) {
-				if (!(iapiListener instanceof PacketEntityUseListener))
-					continue;
-
-				try {
-					((PacketEntityUseListener) iapiListener).useEntity(player, new EntityUsePacket(entityId, clickType));
-				} catch (Exception exception) {
-					NikoAPI.getInstance().getLogger().log(Level.WARNING, "Error while executing interact listener for {0} with {1}: {2}",
-							new String[]{packet.getClass().getSimpleName(), exception.getClass().getSimpleName(), exception.getMessage()});
-				}
+			try {
+				((PacketEntityUseListener) iapiListener).useEntity(player, new EntityUsePacket(entityId, clickType));
+			} catch (Exception exception) {
+				NikoAPI.getInstance().getLogger().log(Level.WARNING, "Error while executing interact listener for {0} with {1}: {2}",
+						new String[]{packet.getClass().getSimpleName(), exception.getClass().getSimpleName(), exception.getMessage()});
 			}
 		}
 	}
